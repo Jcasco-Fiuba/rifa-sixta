@@ -19,4 +19,10 @@ Para publicar, subí el contenido de esta carpeta a un repositorio GitHub y habi
 
 ## Imágenes
 
-Las fotos incluidas son las que se adjuntaron para el costillar, los chorizos y Sixta. La página y el afiche usan el retrato original; no se generó el montaje conceptual de Sixta sosteniendo el premio porque el generador de imágenes integrado no está disponible en esta sesión.
+Las fotos incluidas son las que se adjuntaron para el costillar, los chorizos y Sixta. La página y el afiche usan las fotos originales; el banner sintético `assets/premio-banner.jpg` queda en el proyecto pero no se usa en el afiche descargable.
+
+## Diseño y tipografías
+
+La dirección visual elegida es la de un volante familiar de rifa, con una cuadrícula clara, tinta verde oscura, el coral del vestido de Sixta y amarillo de talonario. La decisión está documentada en `docs/direccion-visual.md`.
+
+Las fuentes Bree Serif y Atkinson Hyperlegible se sirven desde `assets/fonts/` para que la página y el afiche se vean igual en distintos dispositivos. Sus licencias OFL están incluidas junto a los archivos. La skill `frontend-design` usada como criterio está en `.agents/skills/frontend-design/` con su licencia y atribución.

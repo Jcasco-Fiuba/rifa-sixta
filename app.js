@@ -3,8 +3,24 @@
   const KEY = 'rifa-sixta-state-v1';
   const VALID = new Set(['available', 'reserved', 'paid']);
   const labels = { available: 'Disponible', reserved: 'Reservado', paid: 'Pagado' };
-  const posterSans = '"Trebuchet MS", "Segoe UI", Arial, sans-serif';
-  const posterSerif = '"Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif';
+  const posterSans = '"Atkinson Hyperlegible", Arial, sans-serif';
+  const posterSerif = '"Bree Serif", Georgia, serif';
+  const posterColors = {
+    paper: '#e9efe6', surface: '#faf7eb', ink: '#183f3c', muted: '#4c625a',
+    line: '#9cb5a7', coral: '#d56d61', coralDark: '#963e36', gold: '#e0b548',
+    reserved: '#f4d66e', paid: '#963e36'
+  };
+  const posterAssetsReady = Promise.all([
+    loadImage('assets/sixta.png'),
+    loadImage('assets/costillar.png'),
+    loadImage('assets/chorizos.png')
+  ]);
+  const posterFontsReady = document.fonts
+    ? Promise.all([
+      document.fonts.load(`400 72px ${posterSerif}`),
+      document.fonts.load(`700 28px ${posterSans}`)
+    ])
+    : Promise.resolve();
   const numbers = Array.from({ length: 100 }, (_, i) => String(i).padStart(2, '0'));
   const grid = document.getElementById('number-grid');
   const message = document.getElementById('status-message');
@@ -78,68 +94,163 @@
     announce(`Modo seleccionado: ${mode === 'available' ? 'liberar' : labels[mode].toLowerCase()}.`);
   }));
 
-  function roundRect(context, x, y, w, h, r, fill, stroke) {
-    context.beginPath(); context.roundRect(x, y, w, h, r);
-    if (fill) { context.fillStyle = fill; context.fill(); }
-    if (stroke) { context.strokeStyle = stroke; context.lineWidth = 2; context.stroke(); }
-  }
   function loadImage(src) { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; }); }
-  function fitImage(image, x, y, w, h, radius, crop = true, posY = 0.5) {
-    ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, w, h, radius); ctx.clip();
-    if (!crop) {
-      const scale = Math.min(w / image.width, h / image.height);
-      const iw = image.width * scale, ih = image.height * scale;
-      ctx.fillStyle = '#fffdfb'; ctx.fillRect(x, y, w, h);
-      ctx.drawImage(image, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih);
-    } else {
-      const scale = Math.max(w / image.width, h / image.height);
-      const iw = image.width * scale, ih = image.height * scale;
-      ctx.drawImage(image, x + (w - iw) / 2, y + (h - ih) * posY, iw, ih);
-    }
+  function drawPhoto(image, cx, cy, w, h, rotation = 0, crop = false, posY = 0.4) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation);
+    ctx.fillStyle = posterColors.surface;
+    ctx.fillRect(-w / 2 - 11, -h / 2 - 11, w + 22, h + 30);
+    ctx.fillStyle = '#fffdfb';
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(-w / 2, -h / 2, w, h);
+    ctx.clip();
+    const scale = crop
+      ? Math.max(w / image.width, h / image.height)
+      : Math.min(w / image.width, h / image.height);
+    const iw = image.width * scale;
+    const ih = image.height * scale;
+    ctx.drawImage(image, -iw / 2, -h / 2 + (h - ih) * posY, iw, ih);
     ctx.restore();
+    ctx.strokeStyle = posterColors.ink;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(-w / 2 - 8, -h / 2 - 8);
+    ctx.lineTo(w / 2 + 7, -h / 2 - 10);
+    ctx.lineTo(w / 2 + 10, h / 2 + 9);
+    ctx.lineTo(-w / 2 - 9, h / 2 + 8);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawWavyUnderline(x, y, width, color, thickness = 4) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x + width * .22, y - 5, x + width * .3, y + 5, x + width * .52, y + 1);
+    ctx.bezierCurveTo(x + width * .72, y - 4, x + width * .82, y + 4, x + width, y - 1);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness;
+    ctx.lineCap = 'round';
+    ctx.stroke();
   }
   async function drawPoster() {
     if (!ctx) return;
+    const [sixta, ribs, sausages] = await posterAssetsReady;
+    await posterFontsReady;
+    const { paper, surface, ink, muted, line, coral, coralDark, gold, reserved, paid } = posterColors;
     const W = 1080, H = 1920;
-    ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#fbf6f1'; ctx.fillRect(0, 0, W, H);
-    ctx.textAlign = 'left'; ctx.fillStyle = '#a94f51'; ctx.font = `600 31px ${posterSans}`; ctx.fillText('Rifa solidaria', 72, 102);
-    ctx.fillStyle = '#3d302e'; ctx.font = `600 72px ${posterSerif}`; ctx.fillText('Una mano para', 72, 202);
-    ctx.fillStyle = '#a94f51'; ctx.font = `italic 600 78px ${posterSerif}`; ctx.fillText('Sixta Ferreira', 72, 294);
-    ctx.fillStyle = '#796b66'; ctx.font = `500 31px ${posterSans}`; ctx.fillText('Ayudanos a conseguir su marcapasos', 74, 362);
-    const [sixta, banner] = await Promise.all([loadImage('assets/sixta.png'), loadImage('assets/premio-banner.jpg')]);
-    const px = 876, py = 220, pr = 138;
-    ctx.fillStyle = '#f5dfdb'; ctx.beginPath(); ctx.arc(px, py, pr + 10, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#cf726e'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(px, py, pr + 2, 0, Math.PI * 2); ctx.stroke();
-    fitImage(sixta, px - pr, py - pr, pr * 2, pr * 2, pr, true, 0.22);
-    ctx.fillStyle = '#cf726e'; ctx.beginPath(); ctx.arc(980, 106, 44, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#fbf6f1'; ctx.lineWidth = 5; ctx.stroke();
-    ctx.fillStyle = '#fffdfb'; ctx.font = `600 21px ${posterSans}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('Rifa', 980, 107);
-    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-    fitImage(banner, 66, 415, 948, 340, 26, true, 0.56);
-    roundRect(ctx, 66, 415, 948, 340, 26, null, '#e4d7ce');
-    ctx.fillStyle = '#3d302e'; ctx.font = `600 41px ${posterSerif}`; ctx.fillText('Un costillar entero + 2 kg de chorizos', 72, 815);
-    ctx.fillStyle = '#a94f51'; ctx.font = `700 58px ${posterSans}`; ctx.fillText('$10.000', 73, 888);
-    ctx.fillStyle = '#796b66'; ctx.font = `500 31px ${posterSans}`; ctx.fillText('cada número · elegí del 00 al 99', 367, 887);
-    const x0 = 72, y0 = 935, cellW = 93.6, cellH = 59.5;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = paper;
+    ctx.fillRect(0, 0, W, H);
+
+    // The slightly irregular outline borrows the shape of a paper raffle ticket.
+    ctx.strokeStyle = '#85a092';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(38, 36); ctx.lineTo(1042, 31); ctx.lineTo(1045, 1887); ctx.lineTo(35, 1892); ctx.closePath();
+    ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = ink;
+    ctx.font = `700 31px ${posterSans}`;
+    ctx.fillText('Rifa solidaria', 72, 101);
+    ctx.fillStyle = ink;
+    ctx.font = `400 88px ${posterSerif}`;
+    ctx.fillText('Nos juntamos', 72, 213);
+    ctx.fillText('por Sixta', 72, 309);
+    drawWavyUnderline(76, 328, 484, coral, 5);
+    ctx.fillStyle = muted;
+    ctx.font = `400 29px ${posterSans}`;
+    ctx.fillText('Para ayudarla a conseguir su marcapasos.', 76, 382, 640);
+
+    // Sixta's own photo gets the treatment of a small family snapshot.
+    drawPhoto(sixta, 872, 214, 224, 294, -0.035, true, 0.18);
+    ctx.fillStyle = coralDark;
+    ctx.font = `700 24px ${posterSans}`;
+    ctx.fillText('Sixta', 956, 386);
+
+    ctx.fillStyle = ink;
+    ctx.font = `400 42px ${posterSerif}`;
+    ctx.fillText('El premio', 72, 478);
+    drawWavyUnderline(73, 493, 200, gold, 8);
+    drawPhoto(ribs, 282, 630, 350, 252, -0.022, false);
+    drawPhoto(sausages, 756, 630, 420, 252, 0.018, false);
+    ctx.fillStyle = ink;
+    ctx.font = `400 39px ${posterSerif}`;
+    ctx.fillText('Un costillar entero + 2 kg de chorizos', 72, 807);
+
+    // A marker-like swash gives the price one clear place to stand out.
+    ctx.fillStyle = gold;
+    ctx.beginPath();
+    ctx.moveTo(72, 843); ctx.quadraticCurveTo(280, 832, 515, 842);
+    ctx.quadraticCurveTo(720, 831, 1006, 847); ctx.lineTo(1008, 923);
+    ctx.quadraticCurveTo(740, 935, 510, 922); ctx.quadraticCurveTo(290, 934, 72, 918);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = ink;
+    ctx.font = `700 45px ${posterSans}`;
+    ctx.fillText('El número cuesta $10.000', 88, 898);
+
+    ctx.fillStyle = ink;
+    ctx.font = `400 43px ${posterSerif}`;
+    ctx.fillText('Elegí tu número', 72, 987);
+    ctx.fillStyle = muted;
+    ctx.font = `400 25px ${posterSans}`;
+    ctx.fillText('Del 00 al 99', 824, 984);
+
+    const x0 = 72, y0 = 1018, cellW = 93.6, cellH = 58.2;
     for (let i = 0; i < 100; i++) {
       const n = numbers[i], s = status[n], x = x0 + (i % 10) * cellW, y = y0 + Math.floor(i / 10) * cellH;
-      const fills = { available: '#fffdfb', reserved: '#f4dfad', paid: '#c86e68' };
-      const ink = s === 'paid' ? '#fffdfb' : '#3d302e';
-      ctx.fillStyle = fills[s]; ctx.fillRect(x + 2, y + 2, cellW - 4, cellH - 4);
-      ctx.strokeStyle = '#dccdc3'; ctx.lineWidth = 2; ctx.strokeRect(x + 2, y + 2, cellW - 4, cellH - 4);
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = ink; ctx.font = `600 28px ${posterSans}`; ctx.fillText(n, x + cellW / 2, y + cellH / 2 - (s === 'available' ? 0 : 8));
-      if (s !== 'available') { ctx.font = `700 13px ${posterSans}`; ctx.fillText(s === 'paid' ? '✓ PAGADO' : 'R · RES.', x + cellW / 2, y + cellH / 2 + 17); }
+      const fill = s === 'reserved' ? reserved : s === 'paid' ? paid : surface;
+      const foreground = s === 'paid' ? surface : ink;
+      ctx.fillStyle = fill;
+      ctx.fillRect(x + 1, y + 1, cellW - 3, cellH - 3);
+      ctx.strokeStyle = line;
+      ctx.lineWidth = 1.6;
+      ctx.strokeRect(x + 1, y + 1, cellW - 3, cellH - 3);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = foreground;
+      ctx.font = `700 28px ${posterSans}`;
+      ctx.fillText(n, x + cellW / 2, y + cellH / 2 - (s === 'available' ? 0 : 7));
+      if (s !== 'available') {
+        ctx.font = `700 15px ${posterSans}`;
+        ctx.fillText(s === 'paid' ? '✓' : 'R', x + cellW / 2, y + cellH / 2 + 15);
+      }
     }
-    ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
-    const legendY = 1580;
-    const entries = [['#fffdfb', '#bba99d', 'Disponible'], ['#f4dfad', '#d2b66e', 'Reservado'], ['#c86e68', '#c86e68', 'Pagado']];
-    let lx = 80;
-    entries.forEach(([fill, stroke, text]) => { roundRect(ctx, lx, legendY - 25, 30, 30, 7, fill, stroke); ctx.fillStyle = '#5c504b'; ctx.font = `500 25px ${posterSans}`; ctx.fillText(text, lx + 43, legendY); lx += text === 'Disponible' ? 245 : 235; });
-    ctx.fillStyle = '#3d302e'; ctx.font = `600 34px ${posterSerif}`; ctx.fillText('Se sortea cuando estén vendidos todos los números', 72, 1655);
-    ctx.fillStyle = '#796b66'; ctx.font = `500 25px ${posterSans}`; ctx.fillText('Primer premio de la Quiniela de la Ciudad Nocturna', 74, 1698);
-    ctx.fillStyle = '#a94f51'; ctx.font = `700 31px ${posterSans}`; ctx.fillText('Pedí tu número por mensaje privado', 74, 1770);
-    ctx.fillStyle = '#796b66'; ctx.font = `500 24px ${posterSans}`; ctx.fillText('Gracias por ayudar a Sixta 💛', 74, 1814);
-    ctx.textAlign = 'right'; ctx.font = `600 22px ${posterSans}`; ctx.fillText('Rifa familiar', 1005, 1870); ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'left';
+    const legendY = 1624;
+    const entries = [
+      { x: 78, fill: surface, stroke: line, label: 'Disponible' },
+      { x: 395, fill: reserved, stroke: '#b08b24', label: 'Reservado' },
+      { x: 730, fill: paid, stroke: paid, label: 'Pagado' }
+    ];
+    entries.forEach(({ x, fill, stroke, label }) => {
+      ctx.fillStyle = fill; ctx.strokeStyle = stroke; ctx.lineWidth = 2;
+      ctx.fillRect(x, legendY - 25, 31, 31); ctx.strokeRect(x, legendY - 25, 31, 31);
+      ctx.fillStyle = ink; ctx.font = `700 25px ${posterSans}`; ctx.fillText(label, x + 43, legendY);
+    });
+    ctx.fillStyle = ink;
+    ctx.font = `400 36px ${posterSerif}`;
+    ctx.fillText('Se sortea al venderse los 100 números', 72, 1707);
+    ctx.fillStyle = muted;
+    ctx.font = `400 24px ${posterSans}`;
+    ctx.fillText('Quiniela de la Ciudad Nocturna', 76, 1749);
+    drawWavyUnderline(74, 1772, 680, coral, 5);
+    ctx.fillStyle = coralDark;
+    ctx.font = `700 34px ${posterSans}`;
+    ctx.fillText('Pedí tu número por mensaje privado', 74, 1824);
+    ctx.fillStyle = ink;
+    ctx.font = `400 25px ${posterSans}`;
+    ctx.fillText('Gracias por acompañar a Sixta', 76, 1865);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = muted;
+    ctx.font = `400 21px ${posterSans}`;
+    ctx.fillText('Una rifa familiar', 1004, 1865);
+    ctx.textAlign = 'left';
   }
   async function makePosterBlob() {
     await drawPoster();
@@ -178,7 +289,7 @@
     } catch { announce('El archivo no tiene un respaldo válido para esta rifa.'); }
     finally { event.target.value = ''; }
   });
-  Promise.all([loadImage('assets/sixta.png'), loadImage('assets/premio-banner.jpg')]).then(render).catch(() => {
-    render(); announce('No se pudieron cargar las fotos del afiche. Revisá que la carpeta assets esté junto a index.html.');
+  Promise.all([posterAssetsReady, posterFontsReady]).then(render).catch(() => {
+    render(); announce('No se pudieron cargar las fotos o las tipografías. Revisá la carpeta assets.');
   });
 })();
