@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f9f4ef">
+  <meta name="description" content="Rifa solidaria para ayudar a Sixta Ferreira a comprar su marcapasos.">
+  <title>Un número, una mano para Sixta</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="masthead">
+      <div class="identity">
+        <span class="spark" aria-hidden="true">✳</span>
+        <div>
+          <p class="eyebrow">Rifa solidaria</p>
+          <h1>Una mano<br><em>para Sixta</em></h1>
+        </div>
+      </div>
+      <p class="lede">Entre todos podemos ayudar a Sixta Ferreira a conseguir su marcapasos.</p>
+    </header>
+
+    <section class="hero" aria-labelledby="prize-title">
+      <div class="hero-copy">
+        <span class="tag">Un premio para compartir</span>
+        <h2 id="prize-title">¡Un costillar entero<br>y 2 kg de chorizos!</h2>
+        <p>Elegí tu número y sumate a esta ayuda para Sixta.</p>
+        <div class="price-line"><strong>$10.000</strong><span>cada número</span></div>
+        <a class="cta" href="#numeros">Elegir un número <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-photos" aria-label="Fotos del premio: costillar vacuno y chorizos parrilleros">
+        <figure class="photo-ribs"><img src="assets/costillar.png" alt="Costillar vacuno entero, parte del premio"></figure>
+        <figure class="photo-sausages"><img src="assets/chorizos.png" alt="Chorizos parrilleros, parte del premio"></figure>
+        <span class="photo-caption">El premio</span>
+      </div>
+    </section>
+
+    <section class="progress-section" aria-label="Avance de la rifa">
+      <div class="progress-top"><div><span class="eyebrow">La rifa se sortea al completar la venta</span><strong id="paid-count">0 de 100 números pagados</strong></div><span class="raised" id="raised-total">Recaudado: $0</span></div>
+      <div class="progress-track" role="progressbar" aria-label="Números pagados" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar"><span id="progress-fill"></span></div>
+      <p class="progress-note">El sorteo se realiza por la Quiniela de la Ciudad Nocturna cuando estén pagados los 100 números.</p>
+    </section>
+
+    <section class="numbers-section" id="numeros" aria-labelledby="numbers-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">Del 00 al 99</p><h2 id="numbers-title">Elegí tu número</h2></div>
+        <p class="instruction">Tocá un número para cambiar su estado.</p>
+      </div>
+      <div class="legend" aria-label="Estados de los números">
+        <span><i class="dot available"></i>Disponible</span><span><i class="dot reserved"></i>Reservado</span><span><i class="dot paid"></i>Pagado</span>
+      </div>
+      <div class="number-grid" id="number-grid" aria-label="Cuadrícula de números de la rifa"></div>
+    </section>
+
+    <section class="control-panel" aria-labelledby="control-title">
+      <div class="control-intro"><div><p class="eyebrow">Solo en este celular</p><h2 id="control-title">Control de ventas</h2></div><span class="local-badge">Guardado local</span></div>
+      <p class="local-warning">Los cambios se guardan en este navegador. No se sincronizan con otras personas ni actualizan la página pública. Compartí el afiche actualizado para mostrar los números ocupados.</p>
+      <div class="state-actions" role="group" aria-label="Elegí qué hacer al tocar un número">
+        <button class="mode-button selected" type="button" data-mode="reserved" aria-pressed="true">Reservar</button>
+        <button class="mode-button" type="button" data-mode="paid" aria-pressed="false">Marcar pagado</button>
+        <button class="mode-button" type="button" data-mode="available" aria-pressed="false">Liberar</button>
+      </div>
+      <div class="utility-actions">
+        <button class="button button-dark" id="download-poster" type="button">Descargar afiche PNG</button>
+        <button class="button button-light" id="share-poster" type="button">Compartir afiche</button>
+        <button class="button button-light" id="export-json" type="button">Guardar copia de datos</button>
+        <label class="button button-light import-button" for="import-file">Recuperar copia JSON</label>
+        <input id="import-file" type="file" accept="application/json,.json" hidden>
+      </div>
+      <p class="status-message" id="status-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="how-section">
+      <div class="portrait-wrap"><img src="assets/sixta.png" alt="Sixta Ferreira sonriendo, con vestido coral"></div>
+      <div class="how-copy"><p class="eyebrow">Gracias por acompañarnos</p><h2>Un número puede ayudar mucho.</h2><p>Pedí tu número por mensaje privado. El resultado ganador será el número formado por las dos últimas cifras del primer premio de la Quiniela de la Ciudad Nocturna.</p><p class="signature">Con cariño, la familia de Sixta</p></div>
+    </section>
+
+    <footer><span>Rifa solidaria para Sixta Ferreira</span><span>Gracias por ser parte 💛</span></footer>
+  </main>
+
+  <section class="poster-preview" aria-labelledby="poster-title">
+    <div class="poster-tools"><div><p class="eyebrow">Vista previa</p><h2 id="poster-title">Afiche para WhatsApp</h2></div><p>Se actualiza con los estados guardados en este celular.</p></div>
+    <div class="poster-frame"><canvas id="poster-canvas" width="1080" height="1920" aria-label="Vista previa del afiche vertical de la rifa"></canvas></div>
+  </section>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
