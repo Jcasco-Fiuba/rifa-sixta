@@ -4,3 +4,10 @@
 @media(max-width:720px){.page-shell{padding:14px 14px 0}.masthead{padding:24px 4px 26px;display:block}.identity{gap:13px}.spark{font-size:39px}.lede{margin:16px 0 0 52px;font-size:.93rem}.hero{grid-template-columns:1fr;min-height:0}.hero-copy{padding:30px 24px 25px}.hero h2{font-size:2.25rem}.hero-photos{min-height:260px;grid-template-columns:1.15fr .85fr;grid-template-rows:1fr;padding:10px;gap:9px}.photo-ribs img{object-position:center}.photo-sausages img{object-fit:contain}.photo-caption{right:20px;top:20px}.progress-section{padding:29px 4px 19px}.progress-top{align-items:start;flex-direction:column;gap:5px}.section-heading{align-items:start;display:block}.instruction{margin-top:9px}.number-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.number-cell{min-height:53px;font-size:1rem}.control-panel{padding:21px 17px;border-radius:18px}.control-intro h2{font-size:1.95rem}.state-actions{display:grid;grid-template-columns:repeat(3,1fr)}.mode-button{padding:10px 4px}.utility-actions>*{flex:1 1 calc(50% - 9px)}.how-section{grid-template-columns:1fr;gap:24px;padding:42px 4px}.portrait-wrap{height:310px;width:240px;margin:0 auto}.how-copy h2{font-size:2.05rem}footer{padding-inline:4px;font-size:.69rem}.poster-preview{padding:0 14px}.poster-tools{align-items:start;display:block}.poster-tools p:last-child{margin-top:8px}}
 @media(max-width:360px){.hero h2{font-size:1.9rem}.number-grid{gap:5px}.number-cell{min-height:48px;font-size:.9rem}.number-cell .state-mark{font-size:.5rem}.utility-actions>*{flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+/* Tipografía cálida y menos rígida, con sustitutos instalados en la mayoría de los equipos. */
+:root{--sans:"Trebuchet MS","Segoe UI",Arial,sans-serif;--serif:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif}
+.eyebrow{text-transform:none;letter-spacing:.01em;font-size:.8rem;font-weight:600}
+h1,h2{letter-spacing:-.012em}
+h1{line-height:1.04}
+.hero h2{line-height:1.1}

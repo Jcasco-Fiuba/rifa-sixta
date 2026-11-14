@@ -3,6 +3,8 @@
   const KEY = 'rifa-sixta-state-v1';
   const VALID = new Set(['available', 'reserved', 'paid']);
   const labels = { available: 'Disponible', reserved: 'Reservado', paid: 'Pagado' };
+  const posterSans = '"Trebuchet MS", "Segoe UI", Arial, sans-serif';
+  const posterSerif = '"Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif';
   const numbers = Array.from({ length: 100 }, (_, i) => String(i).padStart(2, '0'));
   const grid = document.getElementById('number-grid');
   const message = document.getElementById('status-message');
@@ -100,10 +102,10 @@
     if (!ctx) return;
     const W = 1080, H = 1920;
     ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#fbf6f1'; ctx.fillRect(0, 0, W, H);
-    ctx.textAlign = 'left'; ctx.fillStyle = '#a94f51'; ctx.font = '700 30px Arial'; ctx.fillText('RIFA SOLIDARIA', 72, 102);
-    ctx.fillStyle = '#3d302e'; ctx.font = '600 72px Georgia'; ctx.fillText('Una mano para', 72, 202);
-    ctx.fillStyle = '#a94f51'; ctx.font = 'italic 600 78px Georgia'; ctx.fillText('Sixta Ferreira', 72, 294);
-    ctx.fillStyle = '#796b66'; ctx.font = '500 31px Arial'; ctx.fillText('Ayudanos a conseguir su marcapasos', 74, 362);
+    ctx.textAlign = 'left'; ctx.fillStyle = '#a94f51'; ctx.font = `600 31px ${posterSans}`; ctx.fillText('Rifa solidaria', 72, 102);
+    ctx.fillStyle = '#3d302e'; ctx.font = `600 72px ${posterSerif}`; ctx.fillText('Una mano para', 72, 202);
+    ctx.fillStyle = '#a94f51'; ctx.font = `italic 600 78px ${posterSerif}`; ctx.fillText('Sixta Ferreira', 72, 294);
+    ctx.fillStyle = '#796b66'; ctx.font = `500 31px ${posterSans}`; ctx.fillText('Ayudanos a conseguir su marcapasos', 74, 362);
     const [sixta, banner] = await Promise.all([loadImage('assets/sixta.png'), loadImage('assets/premio-banner.jpg')]);
     const px = 876, py = 220, pr = 138;
     ctx.fillStyle = '#f5dfdb'; ctx.beginPath(); ctx.arc(px, py, pr + 10, 0, Math.PI * 2); ctx.fill();
@@ -111,13 +113,13 @@
     fitImage(sixta, px - pr, py - pr, pr * 2, pr * 2, pr, true, 0.22);
     ctx.fillStyle = '#cf726e'; ctx.beginPath(); ctx.arc(980, 106, 44, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = '#fbf6f1'; ctx.lineWidth = 5; ctx.stroke();
-    ctx.fillStyle = '#fffdfb'; ctx.font = '700 21px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('RIFA', 980, 107);
+    ctx.fillStyle = '#fffdfb'; ctx.font = `600 21px ${posterSans}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('Rifa', 980, 107);
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     fitImage(banner, 66, 415, 948, 340, 26, true, 0.56);
     roundRect(ctx, 66, 415, 948, 340, 26, null, '#e4d7ce');
-    ctx.fillStyle = '#3d302e'; ctx.font = '600 41px Georgia'; ctx.fillText('Un costillar entero + 2 kg de chorizos', 72, 815);
-    ctx.fillStyle = '#a94f51'; ctx.font = '700 58px Arial'; ctx.fillText('$10.000', 73, 888);
-    ctx.fillStyle = '#796b66'; ctx.font = '500 31px Arial'; ctx.fillText('cada número · elegí del 00 al 99', 367, 887);
+    ctx.fillStyle = '#3d302e'; ctx.font = `600 41px ${posterSerif}`; ctx.fillText('Un costillar entero + 2 kg de chorizos', 72, 815);
+    ctx.fillStyle = '#a94f51'; ctx.font = `700 58px ${posterSans}`; ctx.fillText('$10.000', 73, 888);
+    ctx.fillStyle = '#796b66'; ctx.font = `500 31px ${posterSans}`; ctx.fillText('cada número · elegí del 00 al 99', 367, 887);
     const x0 = 72, y0 = 935, cellW = 93.6, cellH = 59.5;
     for (let i = 0; i < 100; i++) {
       const n = numbers[i], s = status[n], x = x0 + (i % 10) * cellW, y = y0 + Math.floor(i / 10) * cellH;
@@ -125,19 +127,19 @@
       const ink = s === 'paid' ? '#fffdfb' : '#3d302e';
       ctx.fillStyle = fills[s]; ctx.fillRect(x + 2, y + 2, cellW - 4, cellH - 4);
       ctx.strokeStyle = '#dccdc3'; ctx.lineWidth = 2; ctx.strokeRect(x + 2, y + 2, cellW - 4, cellH - 4);
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = ink; ctx.font = '600 28px Arial'; ctx.fillText(n, x + cellW / 2, y + cellH / 2 - (s === 'available' ? 0 : 8));
-      if (s !== 'available') { ctx.font = '700 13px Arial'; ctx.fillText(s === 'paid' ? '✓ PAGADO' : 'R · RES.', x + cellW / 2, y + cellH / 2 + 17); }
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = ink; ctx.font = `600 28px ${posterSans}`; ctx.fillText(n, x + cellW / 2, y + cellH / 2 - (s === 'available' ? 0 : 8));
+      if (s !== 'available') { ctx.font = `700 13px ${posterSans}`; ctx.fillText(s === 'paid' ? '✓ PAGADO' : 'R · RES.', x + cellW / 2, y + cellH / 2 + 17); }
     }
     ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
     const legendY = 1580;
     const entries = [['#fffdfb', '#bba99d', 'Disponible'], ['#f4dfad', '#d2b66e', 'Reservado'], ['#c86e68', '#c86e68', 'Pagado']];
     let lx = 80;
-    entries.forEach(([fill, stroke, text]) => { roundRect(ctx, lx, legendY - 25, 30, 30, 7, fill, stroke); ctx.fillStyle = '#5c504b'; ctx.font = '500 25px Arial'; ctx.fillText(text, lx + 43, legendY); lx += text === 'Disponible' ? 245 : 235; });
-    ctx.fillStyle = '#3d302e'; ctx.font = '600 34px Georgia'; ctx.fillText('Se sortea cuando estén vendidos todos los números', 72, 1655);
-    ctx.fillStyle = '#796b66'; ctx.font = '500 25px Arial'; ctx.fillText('Primer premio de la Quiniela de la Ciudad Nocturna', 74, 1698);
-    ctx.fillStyle = '#a94f51'; ctx.font = '700 31px Arial'; ctx.fillText('Pedí tu número por mensaje privado', 74, 1770);
-    ctx.fillStyle = '#796b66'; ctx.font = '500 24px Arial'; ctx.fillText('Gracias por ayudar a Sixta 💛', 74, 1814);
-    ctx.textAlign = 'right'; ctx.font = '600 22px Arial'; ctx.fillText('Rifa familiar', 1005, 1870); ctx.textAlign = 'left';
+    entries.forEach(([fill, stroke, text]) => { roundRect(ctx, lx, legendY - 25, 30, 30, 7, fill, stroke); ctx.fillStyle = '#5c504b'; ctx.font = `500 25px ${posterSans}`; ctx.fillText(text, lx + 43, legendY); lx += text === 'Disponible' ? 245 : 235; });
+    ctx.fillStyle = '#3d302e'; ctx.font = `600 34px ${posterSerif}`; ctx.fillText('Se sortea cuando estén vendidos todos los números', 72, 1655);
+    ctx.fillStyle = '#796b66'; ctx.font = `500 25px ${posterSans}`; ctx.fillText('Primer premio de la Quiniela de la Ciudad Nocturna', 74, 1698);
+    ctx.fillStyle = '#a94f51'; ctx.font = `700 31px ${posterSans}`; ctx.fillText('Pedí tu número por mensaje privado', 74, 1770);
+    ctx.fillStyle = '#796b66'; ctx.font = `500 24px ${posterSans}`; ctx.fillText('Gracias por ayudar a Sixta 💛', 74, 1814);
+    ctx.textAlign = 'right'; ctx.font = `600 22px ${posterSans}`; ctx.fillText('Rifa familiar', 1005, 1870); ctx.textAlign = 'left';
   }
   async function makePosterBlob() {
     await drawPoster();
