@@ -82,7 +82,7 @@
     if (stroke) { context.strokeStyle = stroke; context.lineWidth = 2; context.stroke(); }
   }
   function loadImage(src) { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; }); }
-  function fitImage(image, x, y, w, h, radius, crop = true) {
+  function fitImage(image, x, y, w, h, radius, crop = true, posY = 0.5) {
     ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, w, h, radius); ctx.clip();
     if (!crop) {
       const scale = Math.min(w / image.width, h / image.height);
@@ -92,7 +92,7 @@
     } else {
       const scale = Math.max(w / image.width, h / image.height);
       const iw = image.width * scale, ih = image.height * scale;
-      ctx.drawImage(image, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih);
+      ctx.drawImage(image, x + (w - iw) / 2, y + (h - ih) * posY, iw, ih);
     }
     ctx.restore();
   }
@@ -100,20 +100,25 @@
     if (!ctx) return;
     const W = 1080, H = 1920;
     ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#fbf6f1'; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#cf726e'; ctx.beginPath(); ctx.arc(948, 127, 92, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#fffdfb'; ctx.font = '700 40px Arial'; ctx.textAlign = 'center'; ctx.fillText('RIFA', 948, 141);
     ctx.textAlign = 'left'; ctx.fillStyle = '#a94f51'; ctx.font = '700 30px Arial'; ctx.fillText('RIFA SOLIDARIA', 72, 102);
-    ctx.fillStyle = '#3d302e'; ctx.font = '600 91px Georgia'; ctx.fillText('Una mano para', 72, 222);
-    ctx.fillStyle = '#a94f51'; ctx.font = 'italic 600 105px Georgia'; ctx.fillText('Sixta Ferreira', 72, 330);
-    ctx.fillStyle = '#796b66'; ctx.font = '500 34px Arial'; ctx.fillText('Ayudanos a conseguir su marcapasos', 76, 391);
-    roundRect(ctx, 66, 430, 948, 266, 25, '#f5dfdb');
-    const [ribs, sausages] = await Promise.all([loadImage('assets/costillar.png'), loadImage('assets/chorizos.png')]);
-    fitImage(ribs, 88, 452, 445, 222, 18, true);
-    fitImage(sausages, 550, 452, 438, 222, 18, false);
-    ctx.fillStyle = '#3d302e'; ctx.font = '600 41px Georgia'; ctx.fillText('Un costillar entero + 2 kg de chorizos', 72, 768);
-    ctx.fillStyle = '#a94f51'; ctx.font = '700 58px Arial'; ctx.fillText('$10.000', 73, 856);
-    ctx.fillStyle = '#796b66'; ctx.font = '500 31px Arial'; ctx.fillText('cada número · elegí del 00 al 99', 367, 855);
-    const x0 = 72, y0 = 920, cellW = 93.6, cellH = 61.2;
+    ctx.fillStyle = '#3d302e'; ctx.font = '600 72px Georgia'; ctx.fillText('Una mano para', 72, 202);
+    ctx.fillStyle = '#a94f51'; ctx.font = 'italic 600 78px Georgia'; ctx.fillText('Sixta Ferreira', 72, 294);
+    ctx.fillStyle = '#796b66'; ctx.font = '500 31px Arial'; ctx.fillText('Ayudanos a conseguir su marcapasos', 74, 362);
+    const [sixta, banner] = await Promise.all([loadImage('assets/sixta.png'), loadImage('assets/premio-banner.jpg')]);
+    const px = 876, py = 220, pr = 138;
+    ctx.fillStyle = '#f5dfdb'; ctx.beginPath(); ctx.arc(px, py, pr + 10, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#cf726e'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(px, py, pr + 2, 0, Math.PI * 2); ctx.stroke();
+    fitImage(sixta, px - pr, py - pr, pr * 2, pr * 2, pr, true, 0.22);
+    ctx.fillStyle = '#cf726e'; ctx.beginPath(); ctx.arc(980, 106, 44, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#fbf6f1'; ctx.lineWidth = 5; ctx.stroke();
+    ctx.fillStyle = '#fffdfb'; ctx.font = '700 21px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('RIFA', 980, 107);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    fitImage(banner, 66, 415, 948, 340, 26, true, 0.56);
+    roundRect(ctx, 66, 415, 948, 340, 26, null, '#e4d7ce');
+    ctx.fillStyle = '#3d302e'; ctx.font = '600 41px Georgia'; ctx.fillText('Un costillar entero + 2 kg de chorizos', 72, 815);
+    ctx.fillStyle = '#a94f51'; ctx.font = '700 58px Arial'; ctx.fillText('$10.000', 73, 888);
+    ctx.fillStyle = '#796b66'; ctx.font = '500 31px Arial'; ctx.fillText('cada número · elegí del 00 al 99', 367, 887);
+    const x0 = 72, y0 = 935, cellW = 93.6, cellH = 59.5;
     for (let i = 0; i < 100; i++) {
       const n = numbers[i], s = status[n], x = x0 + (i % 10) * cellW, y = y0 + Math.floor(i / 10) * cellH;
       const fills = { available: '#fffdfb', reserved: '#f4dfad', paid: '#c86e68' };
@@ -124,14 +129,14 @@
       if (s !== 'available') { ctx.font = '700 13px Arial'; ctx.fillText(s === 'paid' ? '✓ PAGADO' : 'R · RES.', x + cellW / 2, y + cellH / 2 + 17); }
     }
     ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
-    const legendY = 1570;
+    const legendY = 1580;
     const entries = [['#fffdfb', '#bba99d', 'Disponible'], ['#f4dfad', '#d2b66e', 'Reservado'], ['#c86e68', '#c86e68', 'Pagado']];
     let lx = 80;
     entries.forEach(([fill, stroke, text]) => { roundRect(ctx, lx, legendY - 25, 30, 30, 7, fill, stroke); ctx.fillStyle = '#5c504b'; ctx.font = '500 25px Arial'; ctx.fillText(text, lx + 43, legendY); lx += text === 'Disponible' ? 245 : 235; });
-    ctx.fillStyle = '#3d302e'; ctx.font = '600 34px Georgia'; ctx.fillText('Se sortea cuando estén vendidos todos los números', 72, 1650);
-    ctx.fillStyle = '#796b66'; ctx.font = '500 25px Arial'; ctx.fillText('Primer premio de la Quiniela de la Ciudad Nocturna', 74, 1694);
-    ctx.fillStyle = '#a94f51'; ctx.font = '700 31px Arial'; ctx.fillText('Pedí tu número por mensaje privado', 74, 1768);
-    ctx.fillStyle = '#796b66'; ctx.font = '500 24px Arial'; ctx.fillText('Gracias por ayudar a Sixta 💛', 74, 1812);
+    ctx.fillStyle = '#3d302e'; ctx.font = '600 34px Georgia'; ctx.fillText('Se sortea cuando estén vendidos todos los números', 72, 1655);
+    ctx.fillStyle = '#796b66'; ctx.font = '500 25px Arial'; ctx.fillText('Primer premio de la Quiniela de la Ciudad Nocturna', 74, 1698);
+    ctx.fillStyle = '#a94f51'; ctx.font = '700 31px Arial'; ctx.fillText('Pedí tu número por mensaje privado', 74, 1770);
+    ctx.fillStyle = '#796b66'; ctx.font = '500 24px Arial'; ctx.fillText('Gracias por ayudar a Sixta 💛', 74, 1814);
     ctx.textAlign = 'right'; ctx.font = '600 22px Arial'; ctx.fillText('Rifa familiar', 1005, 1870); ctx.textAlign = 'left';
   }
   async function makePosterBlob() {
@@ -171,7 +176,7 @@
     } catch { announce('El archivo no tiene un respaldo válido para esta rifa.'); }
     finally { event.target.value = ''; }
   });
-  Promise.all([loadImage('assets/costillar.png'), loadImage('assets/chorizos.png')]).then(render).catch(() => {
-    render(); announce('No se pudieron cargar las fotos del premio. Revisá que la carpeta assets esté junto a index.html.');
+  Promise.all([loadImage('assets/sixta.png'), loadImage('assets/premio-banner.jpg')]).then(render).catch(() => {
+    render(); announce('No se pudieron cargar las fotos del afiche. Revisá que la carpeta assets esté junto a index.html.');
   });
 })();
